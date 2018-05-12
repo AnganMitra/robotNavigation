@@ -5,8 +5,8 @@ from matplotlib import animation
 import random
 import chlotoide as cl
 
-row = 800
-column = 600
+row = 100
+column = 100
 def People_influence(People_List, time,x,y):
     total = 0.0
     waypoint = np.array([x,y])
@@ -20,8 +20,8 @@ def Robot_influence(robot, time,x,y):
     waypoint = np.array([x,y])
     robot_position = np.array([robot.recorded_position_x[time], robot.recorded_position_y[time]])
     dist = np.linalg.norm(robot_position - waypoint)
-    if dist <5 :
-        return 1000000
+    if dist <2 :
+        return 1
     else:
         return 0
 
@@ -49,7 +49,7 @@ def HeatMap_Animation(robot, People_List):
     def init():
         sns.heatmap(np.zeros((row, column)), xticklabels= False, yticklabels= False)
     def animate(i):
-        print (i)
+        # print (i)
         plt.clf()
         sns.heatmap(heat[i-1], xticklabels= False, yticklabels= False)
 

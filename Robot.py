@@ -24,7 +24,7 @@ class Robot(object):
         while True:
             self.trajectory = path.getPath(self.People_List, self.position, self.orientation, self.target)
 
-            for index in range (1,3): # (len(self.trajectory)):
+            for index in range (1,len(self.trajectory)): # (len(self.trajectory)):
                 event = simpy.events.Timeout(self.env, delay=MOTOR_COMMAND_DELAY)
                 yield event
                 vector = np.array(self.trajectory[index]) - np.array(self.position)

@@ -13,7 +13,7 @@ class People(object):
         self.orientation = orientation
         self.velocity = velocity
         self.process = env.process(self.move())
-        self.personal_space_deviation = 3
+        self.personal_space_deviation = 5
         self.gaze_deviation = numpy.pi/4
         self.recorded_position_x= [self.position[0]]
         self.recorded_position_y= [self.position[1]]
@@ -22,11 +22,10 @@ class People(object):
         while True:
             event = simpy.events.Timeout(self.env, delay=0.1)
             yield event
-            # print ("id ", self.id, " time ", self.env.now, " position ", self.position, " orientation ", self.orientation, " velocity ", self.velocity)
+            random.seed()
+            # self.velocity = numpy.array([random.random(), random.random()])*0.1
             self.position += self.velocity
             self.recorded_position_x.append(self.position[0])
             self.recorded_position_y.append(self.position[1])
-            if numpy.linalg.norm(self.velocity) > 0.05:
-                self.recorded_orientation.append(math.atan2(self.velocity[1], self.velocity[0]))
-            else:
-                self.recorded_orientation.append(self.recorded_orientation[-1])
+            self.recorded_orientation.append(math.atan2(self.velocity[1], self.velocity[0]))
+            self.orientation = self.recorded_orientation[-1]

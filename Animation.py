@@ -74,11 +74,14 @@ def Plot3D(robot, People_List):
     plt.show()
 
 
-def Plot_acceleration(robot):
+def Plot_jerk(robot):
     t =  np.linspace(0, SIM_TIME, num = len (robot.recorded_acceleration))
-    plt.plot(t,[np.linalg.norm(acc) for acc in robot.recorded_acceleration])
+    jerk = [np.linalg.norm(robot.recorded_acceleration[0])]
+    for acc in robot.recorded_acceleration[1:]:
+        jerk.append(jerk[-1] + np.linalg.norm(acc) )
+    plt.plot(t,jerk)
     plt.xlabel("Time")
-    plt.ylabel("Acceleration(m/s2)")
+    plt.ylabel("Cumulative Acceleration(m/s2)")
     plt.savefig('acceleration.png')
     plt.show()
 
