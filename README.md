@@ -1,4 +1,1 @@
-# robotNavigation
-# robotNavigation
-# robotNavigation
-# robotNavigation
+A python framework for trajectory generation in social robotics
