@@ -40,13 +40,14 @@ def heuristic(robot_position, target_position):
     return np.linalg.norm(robot_position - target_position )
 
 def compute_target_position(waypoint, people_position, gaze_direction):
-    vector = waypoint - people_position
-    angle = np.arctan2(vector[1],vector[0]) - gaze_direction
-    theta = 0
-    if angle < 0:
-        theta = gaze_direction + np.pi/4
-    else:
-        theta = gaze_direction - np.pi/4
+    # vector = waypoint - people_position
+    # angle = np.arctan2(vector[1],vector[0]) - gaze_direction
+    # theta = 0
+    # if angle < 0:
+    #     theta = gaze_direction + np.pi/4
+    # else:
+    #     theta = gaze_direction - np.pi/4
+    theta = gaze_direction + np.pi/6
     return people_position + SAFE_RADIUS*np.array([np.cos(theta), np.sin(theta)])
 
 class Trajectory(object):
@@ -97,9 +98,9 @@ class Trajectory(object):
                 if people == target:
                     target_position = compute_target_position(waypoint, people_position, people.orientation)
                     self.trajectory_cost += heuristic(waypoint, target_position)
-        angle = np.arctan2(self.waypoint[1][1], self.waypoint[1][0]) - theta
-        if abs(angle) > np.pi/4:
-            self.trajectory_cost = np.inf
+        # angle = np.arctan2(self.waypoint[1][1], self.waypoint[1][0]) - theta
+        # if abs(angle) > np.pi/4:
+        #     self.trajectory_cost = np.inf
         return self.trajectory_cost
 
     def plot_trajectory(self):
@@ -128,8 +129,9 @@ def getPath(People_List, robot_position, theta, target):
     trajectory_set=generate_trajectories(robot_position, theta)
     cost_set = [trajectory.cost(People_List,robot_position, theta, target) for trajectory in trajectory_set]
     selected_trajectory_index = np.argmin(cost_set)
-    return bp.smoothen(trajectory_set[selected_trajectory_index].waypoint)
-    # return trajectory_set[selected_trajectory_index].waypoint
+    # return bp.smoothen(trajectory_set[selected_trajectory_index].waypoint)
+    # print (trajectory_set[selected_trajectory_index].length , trajectory_set[selected_trajectory_index].trajectory_cost)
+    return trajectory_set[selected_trajectory_index].waypoint, trajectory_set[selected_trajectory_index].trajectory_cost
 
 def main ():
     for trajectory in generate_trajectories([0,0], 0):

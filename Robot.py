@@ -3,6 +3,7 @@ import simpy
 from parameters import *
 import numpy as np
 import math
+import bspline_path as bp
 
 class Robot(object):
     def __init__(self, env, position, orientation, velocity, People_List, target):
@@ -19,11 +20,13 @@ class Robot(object):
         self.recorded_velocity = []
         self.recorded_acceleration = []
         self.recorded_orientation =[]
+        self.recorded_cost = []
 
     def move(self):
         while True:
-            self.trajectory = path.getPath(self.People_List, self.position, self.orientation, self.target)
-
+            self.trajectory, cost  = path.getPath(self.People_List, self.position, self.orientation, self.target)
+            self.recorded_cost.append(cost)
+            self.trajectory = bp.smoothen( [[x,y] for x,y in zip (self.recorded_position_x[-2:], self.recorded_position_y[-2:])]  + self.trajectory)[2:]
             for index in range (1,len(self.trajectory)): # (len(self.trajectory)):
                 event = simpy.events.Timeout(self.env, delay=MOTOR_COMMAND_DELAY)
                 yield event

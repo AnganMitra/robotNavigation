@@ -93,6 +93,14 @@ def Plot_velocity(robot):
     plt.savefig('velocity.png')
     plt.show()
 
+def Plot_cost(robot):
+    t =  np.linspace(0, SIM_TIME, num = len (robot.recorded_cost))
+    plt.plot(t,robot.recorded_cost)
+    plt.xlabel("Time")
+    plt.ylabel("Cost")
+    plt.savefig('Cost.png')
+    plt.show()
+
 def Plot_orientation(robot):
     t =  np.linspace(0, SIM_TIME, num = len (robot.recorded_orientation))
     plt.plot(t,robot.recorded_orientation)
