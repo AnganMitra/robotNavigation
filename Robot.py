@@ -4,6 +4,7 @@ from parameters import *
 import numpy as np
 import math
 import bspline_path as bp
+from scipy.stats import linregress
 
 class Robot(object):
     def __init__(self, env, position, orientation, velocity, People_List, target):
@@ -22,11 +23,31 @@ class Robot(object):
         self.recorded_orientation =[]
         self.recorded_cost = []
 
+    def get_points_to_target(self):
+        slope = np.arctan2( self.target[1]-self.position[1],self.target[0]-self.position[0]  )
+        points = [ [self.position[0],self.position[1]]]
+        dist = np.linalg.norm(np.array(self.position) - self.target)
+        multiplier = 0.4
+        for pt in range(8):
+            multiplier += 0.1
+            slope = slope/(pt+1)
+            points.append([self.position[0] + multiplier*dist*np.cos(slope)  , self.position[1] + multiplier*dist*np.sin(slope)])
+        # points.append([self.position[0] + 0.6*dist*np.cos(slope/2)  , self.position[1] + 0.6*dist*np.sin(slope/2)])
+        # points.append([self.position[0] + 1.2*dist*np.cos(slope/4)  , self.position[1] + 1.2*dist*np.sin(slope/4)])
+        return (bp.smoothen(points + [[self.target[0], self.target[1]]]))
+        # return  points + [[self.target[0], self.target[1]]]
+
     def move(self):
         while True:
-            self.trajectory, cost  = path.getPath(self.People_List, self.position, self.orientation, self.target)
+            self.trajectory, cost, target_approach_bool  = path.getPath(self.People_List, self.position, self.orientation, self.People_List[TARGET_INDEX])
             self.recorded_cost.append(cost)
-            self.trajectory = bp.smoothen( [[x,y] for x,y in zip (self.recorded_position_x[-2:], self.recorded_position_y[-2:])]  + self.trajectory)[2:]
+            self.target= path.compute_target_position(np.array(self.People_List[TARGET_INDEX].position), self.People_List[TARGET_INDEX].orientation, self.position)
+            if np.linalg.norm(np.array(self.position) - self.target ) < 0.5 * SAFE_RADIUS and np.linalg.norm(self.People_List[TARGET_INDEX].velocity) < 0.01:
+                    self.trajectory = self.get_points_to_target()
+                    # print ( " ---------- ",self.target, self.position)
+                    # print ("target approaching")
+            else:
+                self.trajectory = bp.smoothen( [[x,y] for x,y in zip (self.recorded_position_x[-2:], self.recorded_position_y[-2:])]  + self.trajectory)[2:]
             for index in range (1,len(self.trajectory)): # (len(self.trajectory)):
                 event = simpy.events.Timeout(self.env, delay=MOTOR_COMMAND_DELAY)
                 yield event

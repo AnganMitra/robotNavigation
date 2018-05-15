@@ -19,9 +19,9 @@ People.People(env, 5,np.array([26.0, 36.0]),1.5*np.pi,np.array([0.0,-0.05]))
 ]
 
 ##            SCENARIO 2
-People_List= [
-People.People(env, 1,np.array([40.0,21.0]),0,np.array([0.01,0.01])),   # clearly maintains a minimum distance
-]
+# People_List= [
+# People.People(env, 1,np.array([40.0,21.0]),0,np.array([0.0,0.0])),   # clearly maintains a minimum distance
+# ]
 
 ##            SCENARIO 3
 # People_List= [                                                    # take care of gaze
@@ -40,6 +40,6 @@ print ("end ", time.time())
 # Plot_velocity(robot)
 # Plot_jerk(robot)
 # Plot_orientation(robot)
-Plot_cost(robot)
-# ta.turtle_animate(robot, People_List)
+# Plot_cost(robot)
+ta.turtle_animate(robot, People_List)
 # hp.HeatMap_Animation(robot, People_List)

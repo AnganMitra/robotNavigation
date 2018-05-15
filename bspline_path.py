@@ -1,4 +1,4 @@
-from parameters import * 
+from parameters import *
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate as si
@@ -26,14 +26,16 @@ def bspline_planning(x, y, sn):
 
     return rx, ry
 
-def smoothen(waypoints):
+def smoothen(waypoints, sn = TRAJECTORY_PIECES ):
     x = np.array([waypoint[0] for waypoint in waypoints])
     y = np.array([waypoint[1] for waypoint in waypoints])
-    sn = TRAJECTORY_PIECES  # sampling number
 
     rx, ry = bspline_planning(x, y, sn)
     smooth_waypoint = [[x,y] for (x,y) in zip(rx, ry)]
     return smooth_waypoint
+
+def smoothen_list(rx,ry,sn):
+    return bspline_planning(np.array(rx), np.array(ry), sn)
 
 def main():
     print(__file__ + " start!!")

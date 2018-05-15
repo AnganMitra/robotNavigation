@@ -39,15 +39,9 @@ def interaction_cost(people_position, waypoint, gaze_direction ,gaze_deviation):
 def heuristic(robot_position, target_position):
     return np.linalg.norm(robot_position - target_position )
 
-def compute_target_position(waypoint, people_position, gaze_direction):
-    # vector = waypoint - people_position
-    # angle = np.arctan2(vector[1],vector[0]) - gaze_direction
-    # theta = 0
-    # if angle < 0:
-    #     theta = gaze_direction + np.pi/4
-    # else:
-    #     theta = gaze_direction - np.pi/4
-    theta = gaze_direction + np.pi/6
+def compute_target_position(people_position, gaze_direction, robot_position):
+    d = np.sign(robot_position[1] - people_position[0]- np.tan(gaze_direction)*(robot_position[0]-people_position[0]))
+    theta = gaze_direction + d*np.pi/6
     return people_position + SAFE_RADIUS*np.array([np.cos(theta), np.sin(theta)])
 
 class Trajectory(object):
@@ -60,6 +54,7 @@ class Trajectory(object):
         self.initial_position = initial_position
         self.generate_waypoint(quadrant)
         self.trajectory_cost = 0.0
+        self.target_approach_bool = False
 
     def generate_waypoint(self, quadrant):
         x_chlotoide_coord, y_chlotoide_coord= chlotoide_x_y_list(self.initial_position, self.length, self.params)
@@ -96,7 +91,10 @@ class Trajectory(object):
                 i_cost = interaction_cost(people_position, waypoint,gaze_direction, people.gaze_deviation)
                 self.trajectory_cost += (s_cost + i_cost)
                 if people == target:
-                    target_position = compute_target_position(waypoint, people_position, people.orientation)
+                    target_position = compute_target_position( people_position, people.orientation,waypoint)
+                    # if np.linalg.norm(waypoint - target_position ) < 1*SAFE_RADIUS:
+                    #     self.target_approach_bool = True
+                        # print "Target In Sight"
                     self.trajectory_cost += heuristic(waypoint, target_position)
         # angle = np.arctan2(self.waypoint[1][1], self.waypoint[1][0]) - theta
         # if abs(angle) > np.pi/4:
@@ -116,22 +114,20 @@ def generate_trajectories(robot_position, theta):
     for length in length_set:
         for param in param_set:
             trajectory_set.append(Trajectory(robot_position,length, param+[theta], 1))
-            # trajectory_set.append(Trajectory(robot_position,length, param+[theta], 2))
-            # trajectory_set.append(Trajectory(robot_position,length, param+[theta], 3))
-            # trajectory_set.append(Trajectory(robot_position,length, param+[theta], 4))
-            # trajectory_set.append(Trajectory(robot_position,length, param+[theta], 5))
-            # trajectory_set.append(Trajectory(robot_position,length, param+[theta], 6))
-            # trajectory_set.append(Trajectory(robot_position,length, param+[theta], 7))
-            # trajectory_set.append(Trajectory(robot_position,length, param+[theta], 8))
+            trajectory_set.append(Trajectory(robot_position,length, param+[theta], 2))
+            trajectory_set.append(Trajectory(robot_position,length, param+[theta], 3))
+            trajectory_set.append(Trajectory(robot_position,length, param+[theta], 4))
+            trajectory_set.append(Trajectory(robot_position,length, param+[theta], 5))
+            trajectory_set.append(Trajectory(robot_position,length, param+[theta], 6))
+            trajectory_set.append(Trajectory(robot_position,length, param+[theta], 7))
+            trajectory_set.append(Trajectory(robot_position,length, param+[theta], 8))
     return trajectory_set
 
 def getPath(People_List, robot_position, theta, target):
     trajectory_set=generate_trajectories(robot_position, theta)
     cost_set = [trajectory.cost(People_List,robot_position, theta, target) for trajectory in trajectory_set]
-    selected_trajectory_index = np.argmin(cost_set)
-    # return bp.smoothen(trajectory_set[selected_trajectory_index].waypoint)
-    # print (trajectory_set[selected_trajectory_index].length , trajectory_set[selected_trajectory_index].trajectory_cost)
-    return trajectory_set[selected_trajectory_index].waypoint, trajectory_set[selected_trajectory_index].trajectory_cost
+    selected_trajectory_index = np.argmin(cost_set)*ndex].trajectory_cost)
+    return trajectory_set[selected_trajectory_index].waypoint, trajectory_set[selected_trajectory_index].trajectory_cost,trajectory_set[selected_trajectory_index].target_approach_bool
 
 def main ():
     for trajectory in generate_trajectories([0,0], 0):

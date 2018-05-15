@@ -7,6 +7,8 @@ plot_scale = 15
 def turtle_animate(Robot, People_List):
     screen = Screen() # create the screen
     setup( width = 2800, height = 2600, startx = 1, starty = 1)
+    span = len(Robot.recorded_position_x)
+    Robot.recorded_position_x, Robot.recorded_position_y = bp.smoothen_list(Robot.recorded_position_x, Robot.recorded_position_y, span)
 
     robot = Turtle() # create the first turtle
     robot_shape = Shape('compound')
