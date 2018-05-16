@@ -126,7 +126,7 @@ def generate_trajectories(robot_position, theta):
 def getPath(People_List, robot_position, theta, target):
     trajectory_set=generate_trajectories(robot_position, theta)
     cost_set = [trajectory.cost(People_List,robot_position, theta, target) for trajectory in trajectory_set]
-    selected_trajectory_index = np.argmin(cost_set)*ndex].trajectory_cost)
+    selected_trajectory_index = np.argmin(cost_set)
     return trajectory_set[selected_trajectory_index].waypoint, trajectory_set[selected_trajectory_index].trajectory_cost,trajectory_set[selected_trajectory_index].target_approach_bool
 
 def main ():
