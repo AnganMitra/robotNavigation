@@ -3,9 +3,8 @@ import numpy as np
 from parameters import *
 import matplotlib.pyplot as plt
 import math
-import bspline_path as bp
 
-length_set = np.linspace(TRAJECTORY_MIN, TRAJECTORY_MAX, num = (TRAJECTORY_MAX - TRAJECTORY_MIN)*10)
+
 def x_integrand(s, params):
     a = params[0]
     b = params[1]
@@ -26,7 +25,7 @@ def chlotoide_x_y_list(initial_position, length, params):
 
 def social_cost(people_position, waypoint, personal_space_deviation):
     dist = np.linalg.norm(people_position - waypoint)
-    if dist < 2*SAFE_RADIUS:
+    if dist < SAFE_RADIUS:
         return 10
     return np.exp( -dist**2 / personal_space_deviation**2)
 
@@ -97,7 +96,7 @@ class Trajectory(object):
 
             if people == target:
                 self.target_position, self.target_orientation = compute_target_position( people_position, people.orientation,waypoint)
-                trajectory_cost += dist_gain*heuristic(waypoint, self.target_position)*time*time
+                trajectory_cost += dist_gain*heuristic(waypoint, self.target_position)*(time*time)
                 angle = math.atan2(self.waypoint[-2][1] - self.waypoint[-2][1] ,self.waypoint[-2][0] - self.waypoint[-2][0] ) - self.target_orientation
                 trajectory_cost += angle_gain*angle
 
@@ -111,8 +110,12 @@ class Trajectory(object):
 
 
 
-def generate_trajectories(robot_position, theta):
+def generate_trajectories(robot_position, theta,  target):
     trajectory_set = []
+    target_position,_ = compute_target_position( target.position, target.orientation,robot_position)
+    t_min = TRAJECTORY_MIN
+    t_max = min (TRAJECTORY_MAX, 0.5+np.linalg.norm(robot_position - target_position))
+    length_set = np.linspace(t_min, t_max, num = (t_max - t_min)*TRAJECTORY_PIECES)
     for length in length_set:
         for param in param_set:
             trajectory_set.append(Trajectory(robot_position,length, param+[theta], 1))
@@ -127,7 +130,7 @@ def generate_trajectories(robot_position, theta):
 
 def getPath(People_List, robot_position, theta, target,env):
     time = env.now
-    trajectory_set=generate_trajectories(robot_position, theta)
+    trajectory_set=generate_trajectories(robot_position, theta,  target)
     cost_set = [trajectory.cost(People_List,robot_position, theta, target,time) for trajectory in trajectory_set]
     selected_trajectory_index = np.argmin(cost_set)
     return trajectory_set[selected_trajectory_index]

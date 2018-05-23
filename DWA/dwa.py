@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 show_animation = False
+SAFE_RADIUS = 5
 
 
 class Config():
@@ -20,7 +21,7 @@ class Config():
         self.dt = 0.1  # [s]
         self.predict_time = 3.0  # [s]
         self.to_goal_cost_gain = 1.0
-        self.speed_cost_gain = 1.0
+        self.speed_cost_gain = 0.1
         self.robot_radius = 1.0  # [m]
 
 
@@ -154,17 +155,22 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):
               head_length=width, head_width=width)
     plt.plot(x, y)
 
+def compute_target_position(people_position, gaze_direction, robot_position):
+    d = np.sign(robot_position[1] - people_position[0]- np.tan(gaze_direction)*(robot_position[0]-people_position[0]))
+    theta = gaze_direction + d*np.pi/6
+    return people_position + 1.5*SAFE_RADIUS*np.array([np.cos(theta), np.sin(theta)])
 
-def test_main(x, goal, ob, ob_vel):
 
 
+def test_main(x, ob, ob_vel,iteration):
+    goal = compute_target_position(np.array([ob[0,0], ob[0,1]]), np.arctan2(ob_vel[0,1], ob_vel[0,1]), np.array([x[0],x[1]]))
     u = np.array([0.0, 0.0])
     config = Config()
     traj = np.array(x)
-    for i in range(1000):
+    for i in range(iteration):
         u, ltraj = dwa_control(x, u, config, goal, ob)
         x = motion(x, u, config.dt)
-        # print (x, u)
+        goal = compute_target_position(np.array([ob[0,0], ob[0,1]]), np.arctan2(ob_vel[0,1], ob_vel[0,1]), np.array([x[0],x[1]]))
         traj = np.vstack((traj, x))  # store state history
         if show_animation:
             plt.cla()
@@ -179,11 +185,11 @@ def test_main(x, goal, ob, ob_vel):
 
         # check goal
         if math.sqrt((x[0] - goal[0])**2 + (x[1] - goal[1])**2) <= config.robot_radius:
-            print("Goal!!")
+            # print("Goal!!")
             break
         ob += ob_vel
 
-    print("Done")
+    # print("Done")
     if show_animation:
         plt.plot(traj[:, 0], traj[:, 1], "-r")
         plt.show()

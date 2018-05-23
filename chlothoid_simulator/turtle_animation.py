@@ -1,7 +1,6 @@
 from turtle import *
 import numpy as np
 from parameters import *
-import bspline_path as bp
 from scipy.interpolate import spline
 count = 1
 plot_scale = 5
@@ -9,7 +8,8 @@ def turtle_animate(Robot, People_List):
     screen = Screen() # create the screen
     setup( width = 2800, height = 2600, startx = 1, starty = 1)
     span = len(Robot.state)
-    recorded_position_x, recorded_position_y = bp.smoothen_list(Robot.state[1:,0],Robot.state[1:,1] , span)
+    recorded_position_x = Robot.state[1:,0]
+    recorded_position_y = Robot.state[1:,1]
     orientation = Robot.state[:,2]
     robot = Turtle() # create the first turtle
     robot_shape = Shape('compound')

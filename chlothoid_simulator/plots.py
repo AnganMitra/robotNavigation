@@ -31,17 +31,19 @@ def Plot3D(robot, People_List):
 
 
 def Plot_jerk(robot):
+    plt.cla()
     t =  np.linspace(0, SIM_TIME, num = len (robot.state))
-    jerk = [np.sqrt(robot.state[0,5]**2+robot.state[0,6]**2)]
-    for acc in robot.state[1:]:
-        jerk.append(jerk[-1] + np.sqrt(acc[5]**2+acc[6]**2 ))
+    jerk = [robot.state[0,-2]]
+    for acc in robot.state[1:,-2]:
+        jerk.append(jerk[-1] + acc)
     plt.plot(t,jerk)
     plt.xlabel("Time")
     plt.ylabel("Cumulative Acceleration(m/s2)")
     plt.savefig('acceleration.png')
-    plt.show()
+    # plt.show()
 
 def Plot_velocity(robot):
+    plt.cla()
     t =  np.linspace(0, SIM_TIME, num = len (robot.state))
     plt.plot(t,robot.state[:,3])
     plt.xlabel("Time")
@@ -50,9 +52,10 @@ def Plot_velocity(robot):
     plt.show()
 
 def Plot_cost(robot):
-    t =  np.linspace(0, SIM_TIME, num = len (robot.cost))
-    plt.plot(t,robot.cost)
+    plt.cla()
+    t =  np.linspace(0, SIM_TIME, num = len (robot.state))
+    plt.plot(t,robot.state[:,-1])
     plt.xlabel("Time")
     plt.ylabel("Cost")
     plt.savefig('Cost.png')
-    plt.show()
+    # plt.show()
