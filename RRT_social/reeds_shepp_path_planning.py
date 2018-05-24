@@ -415,24 +415,18 @@ def test():
 
             #  plt.show()
 
-    print("Test done")
+    # print("Test done")
 
 def heuristic_cost(start_x, start_y, start_yaw, end_x, end_y, end_yaw):
-    curvature = 0.1
+    curvature = 1.0
     step_size = 0.1
 
     px, py, pyaw, mode, clen = reeds_shepp_path_planning(start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
     return sum([abs(elem) for elem in clen])
 
-def path_reed_shepp(start_x, start_y, start_yaw, end_x, end_y, end_yaw):
-    curvature = 0.1
-    step_size = 0.1
-
-    px, py, pyaw, mode, clen = reeds_shepp_path_planning(start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
-    return [(x,y) for x,y in zip(px,py)]
 
 def main():
-    print("Reeds Shepp path planner sample start!!")
+    # print("Reeds Shepp path planner sample start!!")
 
     start_x = -1.0  # [m]
     start_y = -4.0  # [m]
@@ -447,8 +441,7 @@ def main():
 
     px, py, pyaw, mode, clen = reeds_shepp_path_planning(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
-    print (px)
-    print (py)
+
     if show_animation:
         plt.cla()
         plt.plot(px, py, label="final course " + str(mode))
@@ -467,5 +460,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # test()
+    test()
     main()
